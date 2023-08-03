@@ -85,18 +85,4 @@ Shiny: <https://shiny.rstudio.com/>
 
 VKM personnel can also access the PRISMA (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) and ROSES (Reporting Standards for Systematic Evidence Syntheses) guidelines for systematic literature reviews. The guidelines provide a structure for documenting the literature review process and ensuring transparency and reproducibility.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## Acknowledgments
-
-This data management plan is the result of collaborative efforts between VKM personnel and external contributors. We thank all those involved in developing and maintaining this plan.
-
-For additional questions or suggestions regarding this data management plan, please contact VKM's Data Management Committee at data_management_committee@vkm.no.
-
-## Disclaimer
-
-The information provided in this data management plan is subject to change and should be updated regularly. VKM and its personnel are responsible for following VKM's data management policies and guidelines. This document does not replace official policies and regulations set forth by VKM.
-
-For official data management policies and guidelines, please refer to VKM's internal documentation and official communications.
+## END

@@ -12,6 +12,7 @@ output:
 ---
 
 ```{r, echo=FALSE, include=FALSE}
+
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, tidy = TRUE,tidy.opts = list(width.cutoff = 60)) 
 
 pkgTest <- function(x) {
@@ -27,6 +28,7 @@ lapply(packages, pkgTest)
 
 # Sys.setlocale("LC_ALL", "Norwegian")
 setwd(dirname(getActiveDocumentContext()$path))
+
 ```
 
 
@@ -35,6 +37,8 @@ setwd(dirname(getActiveDocumentContext()$path))
 Dette er en guide til de som skal jobbe med data for VKM. Målet her er å sikre god datahåndtering på strukturert og oversiktlig måte for å spare tid og sikre kvalitet og etterprøvbarhet. Planen tar for seg hvordan dataene skal lagres, beskrives med metadata, rettigheter, personvern og ansvar.
 
 Har du spørsmål anngående datahådtering i VKM---kontakt Daniel Flø (Miljø) <daniel.flo@vkm.no> eller Barbara A. Bukhvalova (Mat) <barbara.bukhvalova@vkm.no>
+
+Siste version ligger på [github](https://github.com/Vitenskapskomiteen) 
 
 # Hva er data i VKM
 

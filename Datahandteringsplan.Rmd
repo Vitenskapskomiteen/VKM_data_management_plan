@@ -1,0 +1,483 @@
+---
+title: "Datahåndteringsplan <br> v. 1.0"
+author: "Av Barbara A. Bukhvalova og Daniel Flø"
+subtitle: 'Vitenskapskomiteen for mat og miljø'
+date: "`r Sys.Date()`"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    toc: true
+    css: style.css
+
+---
+
+```{r, echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, tidy = TRUE,tidy.opts = list(width.cutoff = 60)) 
+
+pkgTest <- function(x) {
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x, dep = TRUE, repos = "http://cran.r-project.org")
+    if (!require(x, character.only = TRUE)) stop("Package not found")
+  }
+}
+
+packages <- c("htmltools", "tidyverse", "kableExtra", "viridis", "sf", "rnaturalearth", "rnaturalearthdata", "ggplot2", "ggspatial", "geodata", "tidyterra", "prettydoc", "htmltools", "reshape2", "formatR", "tibble", "kableExtra", "rstudioapi")
+
+lapply(packages, pkgTest)
+
+# Sys.setlocale("LC_ALL", "Norwegian")
+setwd(dirname(getActiveDocumentContext()$path))
+```
+
+
+# Datahåndteringsplan for VKM
+
+Dette er en guide til de som skal jobbe med data for VKM. Målet her er å sikre god datahåndtering på strukturert og oversiktlig måte for å spare tid og sikre kvalitet og etterprøvbarhet. Planen tar for seg hvordan dataene skal lagres, beskrives med metadata, rettigheter, personvern og ansvar.
+
+Har du spørsmål anngående datahådtering i VKM---kontakt Daniel Flø (Miljø) <daniel.flo@vkm.no> eller Barbara A. Bukhvalova (Mat) <barbara.bukhvalova@vkm.no>
+
+# Hva er data i VKM
+
+All registrering og rapporteringer i form av tall, som skapes eller innhentes underveis i prosjektet, og som inngår i statistiske beregninger og modeller, eller som ligger til grunn for tabeller, figurer og kart skal dokumenteres.
+
+# Hvilken data skal man innhente:
+
+## Rådata
+
+Man bør få tak i rådatasettet---rådata har ikke gjennomgått bearbeiding eller annen manipulasjon. Dette kan være data i en Excel-fil med observasjoner notert av en forsker, eller data som kommer direkte fra et måleinstrument, for eksempel en kromatograf eller satellittbilder. Rådata er ofte ustrukturert og kan da ikke brukes direkte i statistiske analyser.
+
+<div class="warning"> 
+Ingen variabler er modifisert
+
+Ingen «nye» variabler
+
+Ingen data eller NA er slettet
+
+Ingen data er summert
+
+Ingen uteliggere er fjernet
+</div>
+
+## Prosessert data
+
+Dette er data som har blitt ryddet og strukturert i en eller annen form. I noen tilfeller har det blitt laget nye variabler eller gjort sammendrag.
+
+```         
+Hver variabel har sin kolonne 
+Hver observasjon har sin rad 
+Hver celle har en observasjon (men kan være NA) 
+```
+
+Hvis det er flere datasett (eller flere observasjoner for en verdi i en eller flere filer) bør datasettene inneholde en ID-kolonne som gjør det mulig å binde datasettene sammen og skille observasjonene fra hverandre.
+
+```         
+Datasettet inneholder ingen makroer eller ustrukturerte kommentarer 
+Datasettet skal ikke inneholde annen tekst eller notater (se metadata) 
+```
+
+<br>
+
+## Metadata
+
+Metadata er informasjon om dataen. Metadata skal ikke skrives inn i rådata-filen eller prosessert data-filen. Metadata dokumentet skal inneholde informasjon om hver enkelt variabel. Metadata kan forberedes for individuelle filer eller på datasettnivå (på tvers av filer). Teknisk informasjon om hvordan dataen er samlet, informasjon om hvordan eventuelle sammendrag og kalkulasjoner er gjennomført. Og kan eventuelt inneholde siteringsinformasjon, kontaktinformasjon, Klausuler, lenker og annen relevant informasjon om dataen. Metadata bør følge struktur gitt i tabell 1 og må inneholde informasjon om hvilken data den beskriver
+
+```
+Informasjon om hver variabel inkludert enheter (kilo, m/s, Hektar. Kan også inkluderes som egen variabel i data-fil).  
+Informasjon om summering og metoder 
+Variabel data type (kategorisk, kontinuerlig, tidsstempel) 
+Informasjon om manglende verdier (NA, nan, -9999) 
+Notater, lenker, opphav, rettigheter, adresser og annen tekst  
+Kontaktinformasjon 
+```
+
+<div class="warning"> 
+Informasjon om hver variabel inkludert enheter (kilo, m/s, Hektar. Kan også inkluderes som egen variabel i data-fil).  
+
+Informasjon om summering og metoder 
+
+Variabel data type (kategorisk, kontinuerlig, tidsstempel) 
+
+Informasjon om manglende verdier (NA, nan, -9999) 
+
+Notater, lenker, opphav, rettigheter, adresser og annen tekst  
+
+Kontaktinformasjon 
+</div>
+
+<br>
+
+*Tabell 1. Eksempel på struktur for metadata*
+
+```{r, echo=F}
+
+eksmepel <- tribble(
+  ~Variabel_navn,    ~variabel_type, ~beskrivelse, ~notater,
+  "ID",  "numerisk",     "Unik posisjons ID",    NA,
+  "Sci_name",   "string",    "vitenskapelig artsnavn",     NA,
+  "t", "dato",    "tid for observasjon ved ID",    "UNIX Timestamp i.e. the number of seconds that have passed since 00:00:00 UTC on Thursday, 1 January 1970"
+  )
+
+eksmepel %>% kbl()
+```
+
+<br>
+
+## Skript eller kodebok
+
+Hvis det finnes prosessert data så bør man få tak i skriptet, eller oppskriften på hvordan man har kommet fra rådata til prosessert data.
+
+```         
+Informasjon om alt som har blitt gjort med datasettet og metoder som er brukt 
+Tilhørende skript (R, Python, MATLAB) 
+Hvis noen manuelle manipulasjoner var gjort (for eksempel i Excel), må de dokumenteres stegvis som tekst 
+Informasjon om pakker og versjonsnummer (fks R sessionInfo()) 
+```
+
+<br>
+
+# Hvordan skal data struktureres og lagres
+
+## Filnavn
+
+```
+Unikt og Informativt filnavn  
+Unngå bruk av spesielle tegn: \ / ? : * ” > < | : # % ” { } | ^ [ ] ` ~  
+Unngå bruk av de nordiske bokstavene: æÆ øØ åÅ äÄ öÖ 
+Unngå bruk av mellomrom. Bruk heller understrek, fks; prosjeknavn_datanavn_2023 
+Hvis filnavn inneholder dato, brukes ÅÅÅÅMMDD format. For eksempel registreres 27. februar, 2023, som “20230227”
+```
+
+## Data struktur
+
+Data kan ta mange former -- for eksempel tabeller, array eller raster med mer, men som oftest får man data i en tabell, gjerne i Excel eller i en tekst fil. En Excel-fil bør ha en av to former (tabell 2 eller 3), brei eller lang (inneholder samme informasjon). Det skal bare være ett datasett (en tabell) per fil. Tabeller bør settes opp etter "Tidy prinsippet": Hver variabel har sin kolonne, hver observasjon har sin rad og hver celle har en observasjon. Ved store mengder data bør man følge databasenormalisering prinsippet.
+
+Den første raden bør inneholde variabelnavn. Informasjon som ikke kan struktureres skal skrives i metadata-filen. Hver variabel (kolonne) kan bare ta en form, for eksempel tall eller tegn (tekst) og disse må ikke blandes. Man må heller ikke blande desimaltegn, komma (,) og desimalt punkt (.), men velg helst desimalt punkt. Bruk av desimalkomma kan forårsake feilinnlesing av data for videre analyse, noe som kan være vanskelig å feilsøke i ettertid. Dato kolonner må være gjennomgående DD-MM-YYYY eller YYYY-MM-DD.
+
+*Tidy Data Wickham, H. . (2014). Tidy Data. Journal of Statistical Software, 59(10), 1--23. <https://doi.org/10.18637/jss.v059.i10>*
+
+<br>
+
+*Tabell 2. Eksempel på struktur - tidy data (brei data)*
+
+```{r, echo=F}
+library(tibble)
+library(kableExtra)
+
+brei_data <- tribble(
+  ~Navn,    ~A, ~B, ~C,
+  "En",  1.1,     2.2,    3.1,
+  "To",   4,    5,     6,
+  "Tre", 7,    8,    NA
+  )
+
+brei_data %>% kbl()
+
+```
+
+<br>
+
+*Tabell 3. Eksempel på struktur - tidy data (lang data)*
+
+```{r, echo=F, warning=FALSE}
+brei_data %>% reshape2::melt() %>% kbl()
+```
+
+<br>
+
+# Lagring av data i VKM
+
+All prosjektdata skal lagres på samme sted. Å ha et sentralisert datalager gjør det enklere å sikre datakvalitet, siden det bare er ett sted å spore og administrere data. Det er lettere å finne dataene ansatte trenger. Det er lettere å oppretthold sikkerhet og kontroll over hvem som har tilgang til hvilke data, siden all tilgang kan administreres på ett sted. Lettere å utføre dataanalyse, siden dataene lett kan nås. All data skal derfor lagres på SharePoint området Prosjektdata i mappen VKM data (VKM Data) med følgende mappehierarki:
+
+```
+* Project_mame_yyyy.mm.dd
+  * literature_data
+    * search_1
+      * 1_search_query
+      * 2_study_selection
+      * 3_full_text
+      * 4_data_extraction
+      * 5_internal_validity
+      * 6_confidence_in_evidence
+    * search_2
+      * [Add details specific to Search 2, etc., if applicable]
+  * data
+    * 1_raw_data
+    * 2_processed_data
+    * 3_metadata
+    * 4_scripts
+    * 5_outputs
+```
+
+Store datafiler på flere GB eller publiserte datasett behøver man ikke å lagre hos VKM. For eksempel verdensdekkende klimadata. Det anbefales allikevel å opprette en egen mappe og en tilhørende lesmeg-fil som inneholder korrekt vitenskapelig sitering med henvisning til datasett og lenker til nettsider. Om det er benyttet en API anbefales det å legge til instruksjoner eller skript. I mange tilfeller har datasett et eget DOI-nummer (Digital Object Identifier), i så fall bør dette siteres. For eksempel har all GBIF-data egne DOI-nummer [GBIF citation guidelines](https://www.gbif.org/citation-guidelines)
+
+<br>
+
+# Deling av data
+
+## Deling og publisering av data
+
+Data kan formidles på nett gjennom for eksempel GitHub og Zenodo (omfanget for dette kan variere med tanke på datarettigheter). Disse nettløsningene erstatter ikke lagring av data i VKM Data mappe.
+
+### GitHub versjonskontrollsystem
+
+Versjonskontroll benyttes i forbindelse med utvikling av programvare, men kan også brukes i andre typer prosjekter som statistisk samarbeid på tvers av institusjoner. Her bør kan koder til større VKM prosjekter lagres. Noe som gjør VKM sitt arbeid transparent og etterprøvbart. Små mengder med prosessert data kan også lagres her.
+
+versjonskontrollsystem ved bruk av Git.
+
+Github: <https://github.com/orgs/Vitenskapskomiteen/dashboard>
+
+<br>
+
+### Andre løsninger
+
+Zenodo er et godt kjent arkiv som driftes av EU/CERN. Her kan man publisere og finne data.
+
+Zenodo: <https://about.zenodo.org/>
+
+Shiny er en R-pakke som gjør det mulig å bygge interaktive nettapplikasjoner (apper) og interaktive dokumenter rett fra R.
+
+Shiny: <https://shiny.rstudio.com/>
+
+<br>
+
+# Litteraturdata 
+
+Det er viktig å sikre etterprøvbarhet av litteraturgjennomgangen i prosjekter. Dette gjør arbeidet enklere når vurderinger skal oppdateres. Litteraturdata bør lagres i en egen mappe sammen med prosjektdata som omtalt i forrige kappittel 
+
+Krav til litteraturdatalagring er avhengig av prosjektomfanget, særlig på tvers av prosjekter med og uten systematiske kunnskapsoppsummeringer (SLR, Systematic literature review) også for prosjekter med ett eller flere spørsmål som krever eget litteratursøk og vurdering. 
+
+
+## Felles krav til litteraturdata 
+
+Alle steg av litteraturgjennomgang skal lagres i egen mappe. Mappestrukturen er omtalt i en figur under. Det blir opprettet en slik mappe per spørsmål det gjøres et adskilt søk og en egen vurdering for. Det er helt essensielt at alt som gjøres blir logført, og at alle valg/beslutninger er beskrevet og begrunnet (for eksempel, konkrete relevanskriterier - ikke bare om en artikkel er relevant eller ikke). 
+
+De tre første undermappene er aktuelle for alle prosjekter/søk. Dataekstraksjon undermappe er potensielt aktuell for alle prosjekter, men kan være lite hensiktsmessig for mindre prosjekter uten strukturert dataekstraksjon. «Risk of bias» og «Confidence in evidence» undermapper er hovedsakelig relevante for prosjekter med SLR. 
+
+Det er et viktig at informasjonen lagres i formater som ikke krever lisenser utover Microsoft Office (for eksempel, txt, docx, xlsx, xml, csv) for å sikre tilgangen over tid. 
+
+
+![Figur 1. Mappestrukturen litteratur](./barbera_flow_plot.png)
+
+<br>
+
+### Dokumentasjon skal oppfylle følgende behov: 
+
+```
+* 1 Dokumentasjon/transparens/etterprøvbarhet 
+* 2 Mulig gjenbruk 
+  * a) Arbeidsbesparelse ved fremtidige oppdateringer og nærliggende prosjekter 
+  * b) Andre formål: AI prosjekter el. 
+```
+
+### Problemstilling for punkt 1 
+
+```
+Kunne gjenfinne alle studier vist i et PRISMA flow chart (for matsiden eller tilsvarende ROSES flytskjema for miljøsiden, begge omtalt under), summerte tall må stemme 
+Kunne gjenfinne begrunnelser for eksklusjon av enkeltstudier fra fulltekst screening 
+Kunne gjenfinne kvalitetsvurdering av enkeltstudier (hvis gjort) fra fulltekst screening 
+Kunne sjekke (meta-analyse) estimater (gjenfinne estimater i artikler, beregninger) 
+```
+ 
+Litteraturgjennomgang kan oppsummeres i et flytskjema. Dokumentasjonen i litteraturdatamappen må begrunne verdier av alle n-er i skjemaet under.  
+
+
+![Figur 2. Eksempel på litteraturgjennomgangstruktur, PRISMA](./prisma.png)
+
+<br>
+
+PRISMA flow-chart kan lages i Word templat, online eller i R: [lenke PRISMA](https://estech.shinyapps.io/prisma_flowdiagram/)
+
+Roses flow-chart kan lages online eller i R: [lenke Roses](https://estech.shinyapps.io/roses_flowchart/)
+
+Dersom VKM ikke har vedtatt en eget rapporteringsstandard for SLR, er PRISMA (Preferred Reporting Items for Systematic reviews and Meta-Analyses) en mulighet, se punkt 6 (Information sources), punkt 7 (Search Strategy) og punkt 16 (Study selection, a) flow of studies and b) excluded studies): [se PRISMA 2020 expanded checklist](http://www.prisma-statement.org/documents/PRISMA_2020_expanded_checklist.pdf) 
+
+
+### Problemstilling for punkt 2 
+
+```
+Kunne oppdatere tidligere litteratursøk (gjerne uten hjelp fra biblioteket) 
+Kunne oppdatere/re-analysere tidligere meta-analyser  
+Kunne gjenbruke filer til AI prosjekter/testing av nye verktøy som vurderes til bruk 
+```
+
+<br>
+
+# Figurer, kart og tabeller i VKM 
+
+## Figurer  
+
+En figur bør inneholde figurforklaring, egen figurtittel, samt informasjon om data og sitering. 
+
+<br>
+
+```{r, boxplot, echo=F, warning=FALSE}
+library(tidyverse)
+library(viridis)
+data(PlantGrowth)
+
+  ggplot(PlantGrowth, aes(x = group, y = weight, fill = group)) +
+  geom_boxplot() +
+  scale_fill_viridis_d() +
+  theme_bw() +
+    labs(title = "Boxplot of dry biomass of plants using viridis colors", 
+         subtitle = "Ggroups represent experimental treatment", 
+         caption = "Figure by VKM 2023\n 
+         Data from: Dobson, A. J. (1983) An Introduction to Statistical Modelling. London: Chapman and Hall")
+  
+```
+
+*Figur 3. Figur eksempel*
+
+<br>
+
+Figurforklaringen (som befinner seg rett under figuren) bør forklare alt i figuren slik at videre tekstlesing bør være unødvendig. I eksemplet over vil det si at ctrl, trt1 og trt2 er definert og svarte punkter og spenn forklart (prosentiler, min/maks osv). Hvis figurforklaringen er tilstrekkelig, kan figurlegende (på den høyre siden av figuren over) droppes. 
+
+<br>
+
+*Tabell 4. foreslåtte Filtyper, størrelser og oppløsning for kart og figurer*
+
+```{r, echo=FALSE}
+format <- tribble(
+  ~Figur, ~ valg,
+  "Filformat",    "png eller .tif (compression `lzw` for .tif)",
+  "Dimensjoner",  "300 dpi",
+  "Oppløsning",   "<=1 MB",
+  "Figurnavn", "Fig01.tif, Fig02.tif, osv."
+  )
+
+format %>% kbl()
+
+```
+
+<br>
+
+*Tabell 5. dimsenjoner for kart og figurer*
+
+```{r, echo=FALSE}
+format <- tribble(
+  ~Dimensjon, ~ `Min Bredde`, ~`Max Bredde`, ~Høyde, ~dpi,
+  "cm",    6.68, 19.05, 22.23, 300, 
+  "in",  2.63, 7.5, 8.75 , 300, 
+  "pixler",  789, 2250, 2625, 300
+  )
+
+format %>% kbl()
+
+```
+
+<br>
+
+## Kart 
+
+Et kart bør inneholde kartforklaring, egen kart tittel, samt nord-pil og skala. Kart bør også inneholde informasjon om hvor dataen kommer fra og sitering. 
+
+```{r, kart, echo=FALSE, fig.width = 10, fig.height = 10}
+
+no <- ne_countries(scale = "medium", returnclass = "sf")
+
+VKM <- data.frame(city = c("VKM"), 
+                       lat = c(59.935386), 
+                       lng = c(10.758761))
+
+oslo <-   geodata::elevation_30s(country="nor", mask=TRUE, path=getwd())
+
+ggplot() +
+  geom_spatraster(data = oslo) +
+  scale_fill_viridis_c(option = "plasma", na.value = "white", labels = scales::label_number(suffix = "m")) +
+  labs(fill = "Elevation")  +
+  annotation_scale(location = "br", width_hint = 0.5) + 
+  annotation_north_arrow(location = "tl", which_north = "true", pad_x = unit(0.75, "in"), pad_y = unit(0.5, "in"), style = north_arrow_fancy_orienteering) +
+  geom_point(data=VKM, aes(x=lng, y=lat), size=3, col="black") +
+  xlab("Longitude") + 
+  ylab("Latitude") +
+  theme(panel.grid.major = element_blank(), panel.background = element_rect(fill = "white")) +
+  ggrepel::geom_text_repel(data = VKM, aes(x = lng, y = lat, label = city), fontface = "bold", nudge_y = c(0, 0, 0, 0, 0), nudge_x = c(4, 4, 4, 4, 4)) +
+  labs(title = "Map of Norway showing elevation above sea level and the location of VKM", 
+       subtitle = "VKM is located at Sandakerveien 24 C (bygg D11) 0473 Oslo, Norway", 
+              caption = "Map by VKM 2023\n Data from geodata")
+
+```
+
+*Figur 4. Kart eksempel*
+
+<br>
+
+## Farger  
+
+Viridis-fargeskalaen er optimalisert for personer med fargesynsmangel (viridis: Colorblind-Friendly Color Maps for R). Den ble først introdusert i viridis-pakken i R, men er også tilgjengelig i Python, Matlab og JavaScript. Viridis-fargeskalaen har flere alternativ, men går fra mørkeblått (lave verdier) til gult (høye verdier) og passet for både diskret og kontinuerlig data, og har også sort hvitt alternativer. Viridis brukes ofte til datavisualisering innen vitenskapelige og tekniske felt. 
+
+[Lenke introduksjon viridis farger](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
+
+[library(viridis)](https://cran.r-project.org/web/packages/viridis/index.html)
+
+[Nuñez et. al., 2018](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0199239)
+
+
+
+
+## Tabeller 
+
+I tabeller bør tall over tusen bruke punktum som desimaltegn for numeriske verdier for eksempel “in 2.020 cases”. 
+
+Tabellforklaring (plasseres under tabellen) bør forklare alt i tabellen slik at videre tekstlesing er unødvendig. For eksempel bør det inkluderer datakilder og forklaring av alle forkortelser. 
+
+<br>
+
+# Vedlegg
+
+#### vedlegg 1 - Eksempel på mappestruktur
+
+Her er en hjelpefunksjon som lager mapper med rett struktur i R wd
+
+```{r, eval=FALSE}
+
+# set root directory (aka "working directory") 
+setwd("C:/Users/xx/prefered_folder")
+
+# 1. Funksjonen oppretter nytt WD 
+# 2. Lager en prosjektmeppe med dagens dato 
+# 3. Lager undermapper 
+
+# definer funksjon
+vkm_data <- function(input = "vkm_data", is.SLR = FALSE, search.num = 1) {
+  newdir <- paste0(getwd(), "/", input, format(Sys.Date(), "_%Y.%m.%d"))
+  
+  # Check if directory already exists
+  if (!file.exists(newdir)) {
+    dir.create(newdir)
+
+    # Create subdirectories
+    dir.create(paste0(getwd(), "/Data"), showWarnings = FALSE)
+    dir.create(paste0(getwd(), "/Literature_Data"), showWarnings = FALSE)
+    
+    for (s in 1:search.num) {
+      dir.create(paste0(getwd(), "/Literature_Data/search_", s), showWarnings = FALSE)
+      dir.create(paste0(getwd(), "/Literature_Data/search_", s, "/1_search_query"), showWarnings = FALSE)
+      dir.create(paste0(getwd(), "/Literature_Data/search_", s, "/2_study_selection"), showWarnings = FALSE)
+      dir.create(paste0(getwd(), "/Literature_Data/search_", s, "/3_full_text"), showWarnings = FALSE)
+      dir.create(paste0(getwd(), "/Literature_Data/search_", s, "/4_data_extraction"), showWarnings = FALSE)
+      
+      if (is.SLR) {
+        dir.create(paste0(getwd(), "/Literature_Data/search_", s, "/5_internal_validity"), showWarnings = FALSE)
+        dir.create(paste0(getwd(), "/Literature_Data/search_", s, "/6_confidence_in_evidence"), showWarnings = FALSE)
+      }
+    }
+    
+    dir.create(paste0(getwd(), "/Data/1_raw_data"), showWarnings = FALSE)
+    dir.create(paste0(getwd(), "/Data/2_processed_data"), showWarnings = FALSE)
+    dir.create(paste0(getwd(), "/Data/3_metadata"), showWarnings = FALSE)
+    dir.create(paste0(getwd(), "/Data/4_scripts"), showWarnings = FALSE)
+    dir.create(paste0(getwd(), "/Data/5_outputs"), showWarnings = FALSE)
+  } else {
+    print("Folder already exists.")
+  }
+}
+
+# kjør funksjon uten SLR 
+vkm_data("navn_paa_prosjekt")
+
+# SLR eksempel med fire søk
+vkm_data("SLR_prosjekt", is.SLR=TRUE, 4)
+
+```
+

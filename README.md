@@ -83,6 +83,6 @@ Zenodo: <https://about.zenodo.org/>
 
 Shiny: <https://shiny.rstudio.com/>
 
-VKM personnel can also access the PRISMA (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) and ROSES (Reporting Standards for Systematic Evidence Syntheses) guidelines for systematic literature reviews. The guidelines provide a structure for documenting the literature review process and ensuring transparency and reproducibility.
+VKM personnel can also access the PRISMA (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) and ROSES (Reporting Standards for Systematic Evidence Syntheses) guidelines for systematic literature reviews. <!-- These are not guidelines as such but REPORTING standards. I wpould suggest users look at the guidelines that we have developed at CEE - https://environmentalevidence.org/information-for-authors/ which includes a Rapid review section  --> The guidelines provide a structure for documenting the literature review process and ensuring transparency and reproducibility.
 
 ## END

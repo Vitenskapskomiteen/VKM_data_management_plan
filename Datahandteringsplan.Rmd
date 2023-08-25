@@ -184,7 +184,11 @@ brei_data %>% kbl()
 *Tabell 3. Eksempel på struktur - tidy data (lang data)*
 
 ```{r, echo=F, warning=FALSE}
-brei_data %>% reshape2::melt() %>% kbl()
+#brei_data %>% reshape2::melt() %>% kbl()
+# Reshape2 is deprecated so might not work that long in to the future
+# pivot_longer replaces it (but it requires a lot more arguments)
+brei_data |> pivot_longer(-Navn, names_to = "variable", values_to = "value") |> kbl()
+
 ```
 
 <br>
@@ -196,6 +200,8 @@ All prosjektdata skal lagres på samme sted. Å ha et sentralisert datalager gj�
 ```
 * Project_mame_yyyy.mm.dd
   * literature_data
+<!-- If truely doing Systematic Review we need a "Protocol" section here too -->
+    * Protocol
     * search_1
       * 1_search_query
       * 2_study_selection
